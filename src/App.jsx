@@ -3,25 +3,31 @@ import "./App.css";
 
 function App() {
   const [catFact, setCatFact] = useState("");
-  const [cat, setCat] = useState(null);
+  const [cat, setCat] = useState();
   const [newCat, setNewCat] = useState(false);
 
   useEffect(() => {
-    let shortFact = "";
-
+    
     fetch("https://catfact.ninja/fact")
       .then((res) => res.json())
       .then((data) => {
-        setCatFact(data.fact || "Gato");
+        const { fact } = data
+        setCatFact(fact || "Gato");
 
-        shortFact = data.fact.split(" ").slice(0,1).toString()
-        setCat(shortFact)
+        const shortFact = fact.split(" ").slice(0,1).toString()
+        fetch(`https://cataas.com/cat/says/${shortFact}?json=true`)
+          .then(res => res.json())
+          .then(data => {
+            const { url } = data
+            setCat(url)
+          })
       });
+
   },[newCat]);
 
   return (
     <>
-      <img src={`https://cataas.com/cat/says/${cat}`} alt="" />
+      <img src={`https://cataas.com${cat}`} alt="A cat photo" />
       <h1>{catFact}</h1>
       <button onClick={() => setNewCat(!newCat)}>Nuevo dato</button>
     </>
